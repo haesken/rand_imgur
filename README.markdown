@@ -1,13 +1,17 @@
 # rand\_imgur
 
-## A script to download random images from imgur
+A script to download random images from imgur
 
-### Requirements
+## Requirements
 - [lxml](http://lxml.de/)
 - [requests](http://docs.python-requests.org/en/latest/index.html)
 - [twisted](http://twistedmatrix.com/trac/)
 
-### Usage
+## Usage
+
+    python rand_imgur.py [options]
+
+## Options
     -h, --help        : display help message
     -f, --folder      : folder to download images to, default = images/
     -i, --interval    : interval between requests (seconds), default = 1
