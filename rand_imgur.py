@@ -144,15 +144,21 @@ def main(args): #{{{
     else:
         log.startLogging(sys.stdout)
 
-    tried = []
+    tried_log_path = 'tried.log'
+    tried_log = open(tried_log_path, "r")
+    tried = tried_log.readlines()
+    tried_log.close()
+
+    tried_log = open(tried_log_path, "a+")
 
     while True:
         url, imgur_name = gen_url()
         if not url in tried:
             grab_image(url, imgur_name, args.folder, args.sendheaders)
             tried.append(url)
+            tried_log.write(url + '\n')
         else:
-            log.msg('Found {url} in list, not trying.'.format(url=url))
+            log.msg("Found {url} in list, not trying.".format(url=url))
 
         sleep(args.interval) #}}}
 
