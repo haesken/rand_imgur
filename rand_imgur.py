@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 
-""" Grab random images from imgur """
+""" Grab random images from imgur. """
 
 import argparse
 import md5
 import os
 import requests
 import sys
+
 from random import choice
 from string import letters, digits
 from time import strftime, sleep
@@ -30,7 +31,7 @@ def get_args(): #{{{
             help="Interval between requests (seconds), default = 1")
 
     parser.add_argument("-l", "--log", action="store_true",
-            help="Output to log file instead of the terminal")
+            help="Output to log file instead of stdout")
 
     parser.add_argument("-s", "--sendheaders", action="store_true",
             help="Send Firefox HTTP headers")
@@ -49,7 +50,6 @@ def gen_url(): #{{{
     extension = ".jpg"
 
     url = base + imgur_name + extension
-
     return (url, imgur_name) #}}}
 
 
@@ -97,7 +97,7 @@ def is_404_gif(image): #{{{
 
 
 def write_image(filename, image, dirpath): #{{{
-    """ Write the image to a file. """
+    """ Write an image to a file. """
 
     if not os.path.exists(dirpath):
         os.makedirs(dirpath)
@@ -107,11 +107,10 @@ def write_image(filename, image, dirpath): #{{{
     outputfile.close() #}}}
 
 
-def grab_image(dirpath, use_headers): #{{{
+def grab_image(url, imgur_name, dirpath, use_headers): #{{{
     """ Grab a random image from imgur and write it to a file. """
 
-    (url, imgur_name) = gen_url()
-    (response_status, response_headers, image) = grab_url(url, use_headers)
+    response_status, response_headers, image = grab_url(url, use_headers)
 
     content_type_header = response_headers["content-type"]
     image_content_types = ["image/gif", "image/jpeg", "image/png"]
@@ -123,33 +122,43 @@ def grab_image(dirpath, use_headers): #{{{
                 timestamp = strftime("%F %H-%M-%S")
                 extension = content_type_header[6:]
 
-                log.msg("Found: www.imgur.com/%s.%s" % (imgur_name, extension))
+                log.msg("Found: www.imgur.com/{imgur_name}.{extension}".format(
+                    imgur_name=imgur_name, extension=extension))
 
-                filename = "%s %s.%s" % (timestamp, imgur_name, extension)
-                log.msg("Writing: %s" % filename)
+                filename = "{timestamp} {imgur_name}.{extension}".format(
+                        timestamp=timestamp,
+                        imgur_name=imgur_name,
+                        extension=extension)
+
+                log.msg("Writing: {filename}".format(filename=filename))
 
                 write_image(filename, image, dirpath) #}}}
 
 
-def main(): #{{{
+def main(args): #{{{
     """ Run forever, grab an image every N seconds. """
 
-    try:
-        args = get_args()
+    if args.log == True:
+        log_filename = "rand_imgur.log"
+        log.startLogging(open(log_filename, "a"))
+    else:
+        log.startLogging(sys.stdout)
 
-        if args.log == True:
-            log_filename = "rand_imgur.log"
-            log.startLogging(open(log_filename, "a"))
+    tried = []
+
+    while True:
+        url, imgur_name = gen_url()
+        if not url in tried:
+            grab_image(url, imgur_name, args.folder, args.sendheaders)
+            tried.append(url)
         else:
-            log.startLogging(sys.stdout)
+            log.msg('Found {url} in list, not trying.'.format(url=url))
 
-        while True:
-            grab_image(args.folder, args.sendheaders)
-            sleep(args.interval)
+        sleep(args.interval) #}}}
 
+
+if __name__ == '__main__': #{{{
+    try:
+        main(get_args())
     except KeyboardInterrupt:
         sys.exit() #}}}
-
-
-if __name__ == '__main__':
-    main()
