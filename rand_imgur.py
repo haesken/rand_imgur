@@ -86,13 +86,13 @@ def grab_url(url, use_headers): #{{{
         pass #}}}
 
 
-def is_404_gif(image): #{{{
+def is_404_image(image): #{{{
     """ Check if an image is imgur's 404 gif. """
 
-    hash_404_gif = "eebc93350a68a64022b7482f460017ba"
+    hash_404_image = "d835884373f4d6c8f24742ceabe74946"
     hash_image = md5.new(image).hexdigest()
 
-    if hash_image == hash_404_gif:
+    if hash_image == hash_404_image:
         return True #}}}
 
 
@@ -118,7 +118,7 @@ def grab_image(url, imgur_name, dirpath, use_headers): #{{{
     # Keep this status code check here so we don't crash on a bad response
     if response_status == 200:
         if content_type_header in image_content_types:
-            if not is_404_gif(image):
+            if not is_404_image(image):
                 timestamp = strftime("%F %H-%M-%S")
                 extension = content_type_header[6:]
 
@@ -145,9 +145,12 @@ def main(args): #{{{
         log.startLogging(sys.stdout)
 
     tried_log_path = 'tried.log'
-    tried_log = open(tried_log_path, "r")
-    tried = tried_log.readlines()
-    tried_log.close()
+    if os.path.exists(tried_log_path):
+        tried_log = open(tried_log_path, "r")
+        tried = tried_log.readlines()
+        tried_log.close()
+    else:
+        tried = None
 
     tried_log = open(tried_log_path, "a+")
 
