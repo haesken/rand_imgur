@@ -14,7 +14,7 @@ from time import strftime, sleep
 from twisted.python import log
 
 
-def get_args(): #{{{
+def get_args():
     """ Get arguments from the command line. """
 
     parser = argparse.ArgumentParser(
@@ -37,10 +37,10 @@ def get_args(): #{{{
             help="Send Firefox HTTP headers")
 
     args = parser.parse_args()
-    return args #}}}
+    return args
 
 
-def gen_url(): #{{{
+def gen_url():
     """ Generate an imgur url using random characters.
         Returns the full url and the short imgur name.
     """
@@ -50,10 +50,10 @@ def gen_url(): #{{{
     extension = ".jpg"
 
     url = base + imgur_name + extension
-    return (url, imgur_name) #}}}
+    return (url, imgur_name)
 
 
-def grab_url(url, use_headers): #{{{
+def grab_url(url, use_headers):
     """ Grab a url, return the content, headers, and status code of the
         response.
         Has a toggle to send Firefox http headers.
@@ -70,7 +70,7 @@ def grab_url(url, use_headers): #{{{
             "Accept-Encoding": "gzip, deflate",
             "DNT": "1",
             "Connection": "keep-alive",
-            } #}}}
+            }
 
     try:
         # Toggle to send Firefox http headers
@@ -83,20 +83,20 @@ def grab_url(url, use_headers): #{{{
 
     # Ignore connection errors
     except requests.exceptions.ConnectionError:
-        pass #}}}
+        pass
 
 
-def is_404_image(image): #{{{
+def is_404_image(image):
     """ Check if an image is imgur's 404 gif. """
 
     hash_404_image = "d835884373f4d6c8f24742ceabe74946"
     hash_image = md5.new(image).hexdigest()
 
     if hash_image == hash_404_image:
-        return True #}}}
+        return True
 
 
-def write_image(filename, image, dirpath): #{{{
+def write_image(filename, image, dirpath):
     """ Write an image to a file. """
 
     if not os.path.exists(dirpath):
@@ -104,10 +104,10 @@ def write_image(filename, image, dirpath): #{{{
 
     outputfile = open(dirpath + filename, "w")
     outputfile.write(image)
-    outputfile.close() #}}}
+    outputfile.close()
 
 
-def grab_image(url, imgur_name, dirpath, use_headers): #{{{
+def grab_image(url, imgur_name, dirpath, use_headers):
     """ Grab a random image from imgur and write it to a file. """
 
     response_status, response_headers, image = grab_url(url, use_headers)
@@ -132,10 +132,10 @@ def grab_image(url, imgur_name, dirpath, use_headers): #{{{
 
                 log.msg("Writing: {filename}".format(filename=filename))
 
-                write_image(filename, image, dirpath) #}}}
+                write_image(filename, image, dirpath)
 
 
-def main(args): #{{{
+def main(args):
     """ Run forever, grab an image every N seconds. """
 
     if args.log == True:
@@ -163,11 +163,11 @@ def main(args): #{{{
         else:
             log.msg("Found {url} in list, not trying.".format(url=url))
 
-        sleep(args.interval) #}}}
+        sleep(args.interval)
 
 
-if __name__ == '__main__': #{{{
+if __name__ == '__main__':
     try:
         main(get_args())
     except KeyboardInterrupt:
-        sys.exit() #}}}
+        sys.exit()
