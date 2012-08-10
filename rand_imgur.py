@@ -58,7 +58,9 @@ def grab_url(url):
         return (req.status_code, req.headers, req.content)
 
     # Ignore connection errors
-    except requests.exceptions.ConnectionError:
+    except (requests.exceptions.ConnectionError,
+            requests.exceptions.HTTPError,
+            requests.exceptions.RequestException):
         pass
 
 
