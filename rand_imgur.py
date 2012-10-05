@@ -1,39 +1,29 @@
 #!/usr/bin/env python
+# encoding: utf-8
 
-""" Grab random images from imgur. """
+""" Rand Imgur - Download random images from imgur.
 
-import argparse
+Usage:
+  rand_imgur.py [options]
+
+Options:
+  -h --help           show this
+  -d --directory DIR  directory to download images to [default: images]
+  -i --interval N     seconds between each request [default: 1]
+  -l --log            write output to a log instead of stdout
+
+"""
+
 import md5
 import os
 import requests
 import sys
 
+from docopt import docopt
 from random import choice
 from string import letters, digits
 from time import strftime, sleep
 from twisted.python import log
-
-
-def get_args():
-    """ Get arguments from the command line. """
-
-    parser = argparse.ArgumentParser(
-            description="Grab random images from imgur",
-            formatter_class=argparse.RawTextHelpFormatter)
-
-    parser.add_argument("-f", "--folder", type=str, default="images/",
-            help="Optional name of the folder to download images to.\n" +
-                 "Must include a slash at the end of the path.\n" +
-                 "Default is 'images/'")
-
-    # Don't be evil, keep the interval at a sane speed
-    parser.add_argument("-i", "--interval", type=float, default=1,
-            help="Interval between requests (seconds), default = 1")
-
-    parser.add_argument("-l", "--log", action="store_true",
-            help="Output to log file instead of stdout")
-
-    return parser.parse_args()
 
 
 def gen_url():
@@ -80,7 +70,7 @@ def write_image(filename, image, dirpath):
     if not os.path.exists(dirpath):
         os.makedirs(dirpath)
 
-    outputfile = open(dirpath + filename, "w")
+    outputfile = open(os.path.join(dirpath, filename), "w")
     outputfile.write(image)
     outputfile.close()
 
@@ -116,7 +106,7 @@ def grab_image(url, imgur_name, dirpath):
 def main(args):
     """ Run forever, grab an image every N seconds. """
 
-    if args.log == True:
+    if args["--log"] == True:
         log_filename = "rand_imgur.log"
         log.startLogging(open(log_filename, "a"))
     else:
@@ -135,17 +125,17 @@ def main(args):
     while True:
         url, imgur_name = gen_url()
         if not url in tried:
-            grab_image(url, imgur_name, args.folder)
+            grab_image(url, imgur_name, args["--directory"])
             tried.append(url)
             tried_log.write(url + '\n')
         else:
             log.msg("Found {url} in list, not trying.".format(url=url))
 
-        sleep(args.interval)
+        sleep(float(args["--interval"]))
 
 
 if __name__ == '__main__':
     try:
-        main(get_args())
+        main(docopt(__doc__))
     except KeyboardInterrupt:
         sys.exit()
