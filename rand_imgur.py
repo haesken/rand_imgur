@@ -7,10 +7,10 @@ Usage:
   rand_imgur.py [options]
 
 Options:
-  -h --help           show this
-  -d --directory DIR  directory to download images to [default: images]
-  -i --interval N     seconds between each request [default: 1]
-  -l --log            write output to a log instead of stdout
+  -h --help           Show this help
+  -d --directory DIR  Directory to download images to [default: images]
+  -i --interval N     Seconds between each request [default: 1]
+  -l --log            Write output to a log instead of stdout
 
 """
 

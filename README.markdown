@@ -5,13 +5,15 @@ A script to download random images from imgur
 ## Requirements
 - [requests](http://docs.python-requests.org/en/latest/index.html)
 - [twisted](http://twistedmatrix.com/trac/)
+- [docopt](http://github.com/docopt/docopt)
 
 ## Usage
 
-    python rand_imgur.py [options]
+    rand_imgur.py [options]
 
 ## Options
-    -h, --help        : display help message
-    -f, --folder      : folder to download images to, default = images/
-    -i, --interval    : interval between requests (seconds), default = 1
-    -l, --log         : send logging output to rand\_imgur.log, not stdout
+
+    -h --help           Show this help
+    -d --directory DIR  Directory to download images to [default: images]
+    -i --interval N     Seconds between each request [default: 1]
+    -l --log            Write output to a log instead of stdout
